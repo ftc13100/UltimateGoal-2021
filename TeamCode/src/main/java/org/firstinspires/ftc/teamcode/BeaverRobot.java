@@ -19,5 +19,5 @@ public class BeaverRobot extends Robot {
         this(dt, newIntake);
         setSafetyMode(safetyMode);
     }
-    
+
 }

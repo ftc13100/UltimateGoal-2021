@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Hardware.YellowJacket435;
 public class Intake extends SubsystemBase {
     private final YellowJacket435 intakeMotor;
 
-    public Intake(final HardwareMap map, String name) {
+    public Intake(final HardwareMap map) {
         intakeMotor = new YellowJacket435(map, "intakeMotor");
     }
 
