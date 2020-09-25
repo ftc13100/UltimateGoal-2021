@@ -4,7 +4,7 @@ import com.arcrobotics.ftclib.Robot;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.util.Safety;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 public class BeaverRobot extends Robot {
     private MecanumDrive drivetrain;

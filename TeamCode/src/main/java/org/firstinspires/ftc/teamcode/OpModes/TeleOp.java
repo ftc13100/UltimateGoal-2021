@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.opModes;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Commands.ActuateIntake;
-import org.firstinspires.ftc.teamcode.Config.ControlBoard;
-import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.commands.ActuateIntake;
+import org.firstinspires.ftc.teamcode.config.ControlBoard;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 
 public class TeleOp extends LinearOpMode {

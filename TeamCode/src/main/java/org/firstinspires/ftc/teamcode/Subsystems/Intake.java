@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Hardware.YellowJacket435;
+import org.firstinspires.ftc.teamcode.hardware.YellowJacket435;
 
 public class Intake extends SubsystemBase {
+
     private final YellowJacket435 intakeMotor;
 
     public Intake(final HardwareMap map) {
