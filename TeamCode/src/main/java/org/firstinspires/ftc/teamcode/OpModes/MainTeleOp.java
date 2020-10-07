@@ -4,11 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.BeaverRobot;
-import org.firstinspires.ftc.teamcode.drivebase.MecanumDrive;
-import org.firstinspires.ftc.teamcode.hardware.MotorEx;
-import org.firstinspires.ftc.teamcode.commands.ActuateIntake;
-import org.firstinspires.ftc.teamcode.config.ControlBoard;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 @TeleOp(name="TeleOp")
 public class MainTeleOp extends LinearOpMode {

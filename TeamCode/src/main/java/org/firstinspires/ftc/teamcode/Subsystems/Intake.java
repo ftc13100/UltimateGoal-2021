@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.hardware.Motor;
-import org.firstinspires.ftc.teamcode.hardware.MotorEx;
 
 public class Intake extends SubsystemBase {
 
@@ -15,7 +14,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Intake(HardwareMap map, String intakeMotor) {
-        this.intakeMotor = new MotorEx(map, intakeMotor, Motor.GoBILDA.RPM_435);
+        this.intakeMotor = new MotorEx(map, intakeMotor, MotorEx.GoBILDA.RPM_435);
     }
 
     public void setPower(double power) {

@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.drivebase.MecanumDrive;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.teamcode.drivebase.MecanumDrive;
-import org.firstinspires.ftc.teamcode.hardware.MotorEx;
 
 
 public class Drivetrain extends SubsystemBase {
@@ -20,5 +19,13 @@ public class Drivetrain extends SubsystemBase {
     public Drivetrain(HardwareMap hMap, String frontLeft, String frontRight, String backLeft,
                       String backRight, final double diameter) {
         this(new MotorEx(hMap, frontLeft), new MotorEx(hMap, frontRight), new MotorEx(hMap, backLeft), new MotorEx(hMap, backRight), diameter);
+    }
+
+    public void driveRobotCentric(double strafeSpeed, double forwardSpeed, double turnSpeed) {
+        drive.driveRobotCentric(strafeSpeed, forwardSpeed, turnSpeed);
+    }
+
+    public void driveFieldCentric(double strafeSpeed, double forwardSpeed, double turnSpeed, double gyroAngle) {
+        drive.driveFieldCentric(strafeSpeed, forwardSpeed, turnSpeed, gyroAngle);
     }
 }
