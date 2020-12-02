@@ -1,24 +1,36 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
+import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.BeaverRobot;
+import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.config.Constants;
+import org.firstinspires.ftc.teamcode.config.ControlBoard;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 @TeleOp(name="TeleOp")
-public class MainTeleOp extends LinearOpMode {
+public class MainTeleOp extends CommandOpMode {
 
-    BeaverRobot robot = new BeaverRobot(this, true);
+    private MotorEx intakeMotor;
+    private Intake intake;
+
+    private ControlBoard controlBoard;
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        waitForStart();
+    public void initialize() {
+        // initialize motors
+        intakeMotor = new MotorEx(hardwareMap, "intakeMotor", MotorEx.GoBILDA.RPM_435);
 
-        while (opModeIsActive() && !isStopRequested()) {
-            //the scheduler will keep track of all of the triggers we made
-            robot.run();
-        }
+        // initialize subsystems
+        intake = new Intake(intakeMotor);
 
-        robot.reset();
+        // intake commands
+        intake.setDefaultCommand(new IntakeCommand(intake, Constants.Intake.IntakeState.STOP));
+        controlBoard.getIntakeIn().whenHeld(new IntakeCommand(intake, Constants.Intake.IntakeState.IN));
+        controlBoard.getIntakeOut().whenHeld(new IntakeCommand(intake, Constants.Intake.IntakeState.OUT));
+
+        // register subsystems
+        register(intake);
     }
 }

@@ -6,15 +6,22 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 public class RunShooter extends CommandBase {
     private Shooter shooter;
-    private double shooterPower;
+    private double shooterVelocity;
 
-    public RunShooter(Shooter shooter1, double power) {
+    public RunShooter(Shooter shooter1, double velocity) {
         shooter = shooter1;
-        shooterPower = power;
+        shooterVelocity = velocity;
+        addRequirements(shooter);
     }
 
     @Override
     public void execute() {
-        shooter.setPower(shooterPower);
+        shooter.setVelocity(shooterVelocity);
+    }
+
+    @Override
+    public boolean isFinished() {
+        //keep running the shooter as long as we are not at the right velocity
+        return shooter.getVelocity() != shooterVelocity;
     }
 }
