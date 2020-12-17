@@ -23,9 +23,9 @@ public class ControlBoard {
 
     GamepadButton runShooter = new GamepadButton(operator, GamepadKeys.Button.X);
 
-    DoubleSupplier driveForward = () -> driver.getLeftY();
-    DoubleSupplier driveStrafe = () -> driver.getLeftX();
-    DoubleSupplier driverRotate = () -> driver.getRightX();
+    DoubleSupplier driveForward = driver::getLeftY;
+    DoubleSupplier driveStrafe = driver::getLeftX;
+    DoubleSupplier driverRotate = driver::getRightX;
 
 
     public GamepadButton getIntakeIn() {
