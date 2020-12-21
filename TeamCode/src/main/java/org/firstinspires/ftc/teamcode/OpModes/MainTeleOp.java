@@ -22,8 +22,7 @@ public class MainTeleOp extends CommandOpMode {
 
     @Override
     public void initialize() {
-        // initialize motors
-
+        controlBoard = new ControlBoard(this);
 
         // initialize subsystems
         drivetrain = new Drivetrain(new SampleMecanumDrive(hardwareMap), false);
