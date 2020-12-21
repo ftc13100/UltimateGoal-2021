@@ -19,6 +19,8 @@ public class MainTeleOp extends CommandOpMode {
 
     @Override
     public void initialize() {
+        controlBoard = new ControlBoard(this);
+
         // initialize motors
         intakeMotor = new MotorEx(hardwareMap, "intakeMotor", MotorEx.GoBILDA.RPM_435);
 
