@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.BeaverRobot;
 import org.firstinspires.ftc.teamcode.commands.DefaultDrive;
+import org.firstinspires.ftc.teamcode.commands.RunCommand;
 import org.firstinspires.ftc.teamcode.config.Constants;
 import org.firstinspires.ftc.teamcode.config.ControlBoard;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -39,6 +42,6 @@ public class MainTeleOp extends CommandOpMode {
         ));
 
         //schedule logging
-        schedule();
+        schedule(new InstantCommand());
     }
 }

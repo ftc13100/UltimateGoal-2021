@@ -2,30 +2,34 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.config.ValueProvider;
-import com.acmerobotics.dashboard.config.variable.BasicVariable;
-import com.acmerobotics.dashboard.config.variable.CustomVariable;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.util.NanoClock;
+import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.button.Button;
+import com.arcrobotics.ftclib.command.button.GamepadButton;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.commands.RunCommand;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import java.util.List;
 
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
-/*
+/**
  * This routine is designed to tune the PID coefficients used by the REV Expansion Hubs for closed-
  * loop velocity control. Although it may seem unnecessary, tuning these coefficients is just as
  * important as the positional parameters. Like the other manual tuning routines, this op mode
@@ -44,19 +48,25 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  *    mitigate oscillations.
  * 2. Add kI (or adjust kF) until the steady state/constant velocity plateaus are reached.
  * 3. Back off kP and kD a little until the response is less oscillatory (but without lag).
+ *
+ * Pressing X (on the Xbox and Logitech F310 gamepads, square on the PS4 Dualshock gamepad) will
+ * pause the tuning process and enter driver override, allowing the user to reset the position of
+ * the bot in the event that it drifts off the path.
+ * Pressing A (on the Xbox and Logitech F310 gamepads, X on the PS4 Dualshock gamepad) will cede
+ * control back to the tuning process.
+ *
+ * NOTE: this has been refactored to use FTCLib's command-based
  */
 @Config
 @Autonomous(group = "drive")
-public class DriveVelocityPIDTuner extends LinearOpMode {
+public class DriveVelocityPIDTuner extends CommandOpMode {
+
     public static double DISTANCE = 72; // in
 
-    private static final String PID_VAR_NAME = "VELO_PID";
-
-    private FtcDashboard dashboard = FtcDashboard.getInstance();
-    private String catName;
-    private CustomVariable catVar;
-
-    private SampleMecanumDrive drive;
+    enum Mode {
+        DRIVER_MODE,
+        TUNING_MODE
+    }
 
     private static MotionProfile generateProfile(boolean movingForward) {
         MotionState start = new MotionState(movingForward ? 0 : DISTANCE, 0, 0, 0);
@@ -67,125 +77,107 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
                 DriveConstants.BASE_CONSTRAINTS.maxJerk);
     }
 
-    private void addPidVariable() {
-        catName = getClass().getSimpleName();
-        catVar = (CustomVariable) dashboard.getConfigRoot().getVariable(catName);
-        if (catVar == null) {
-            // this should never happen...
-            catVar = new CustomVariable();
-            dashboard.getConfigRoot().putVariable(catName, catVar);
-
-            RobotLog.w("Unable to find top-level category %s", catName);
-        }
-
-        CustomVariable pidVar = new CustomVariable();
-        pidVar.putVariable("kP", new BasicVariable<>(new ValueProvider<Double>() {
-            @Override
-            public Double get() {
-                return drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kP;
-            }
-
-            @Override
-            public void set(Double value) {
-                PIDCoefficients coeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-                drive.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
-                        new PIDCoefficients(value, coeffs.kI, coeffs.kD));
-            }
-        }));
-        pidVar.putVariable("kI", new BasicVariable<>(new ValueProvider<Double>() {
-            @Override
-            public Double get() {
-                return drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kI;
-            }
-
-            @Override
-            public void set(Double value) {
-                PIDCoefficients coeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-                drive.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
-                        new PIDCoefficients(coeffs.kP, value, coeffs.kD));
-            }
-        }));
-        pidVar.putVariable("kD", new BasicVariable<>(new ValueProvider<Double>() {
-            @Override
-            public Double get() {
-                return drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kD;
-            }
-
-            @Override
-            public void set(Double value) {
-                PIDCoefficients coeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-                drive.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
-                        new PIDCoefficients(coeffs.kP, coeffs.kI, value));
-            }
-        }));
-
-        catVar.putVariable(PID_VAR_NAME, pidVar);
-        dashboard.updateConfig();
-    }
-
-    private void removePidVariable() {
-        if (catVar.size() > 1) {
-            catVar.removeVariable(PID_VAR_NAME);
-        } else {
-            dashboard.getConfigRoot().removeVariable(catName);
-        }
-        dashboard.updateConfig();
-    }
+    private Drivetrain drive;
+    private GamepadEx gamepad;
+    private Button xButton, aButton;
+    private Mode mode;
+    private boolean movingForwards;
+    private NanoClock clock;
+    private MotionProfile activeProfile;
+    private double profileStart, lastKp, lastKi, lastKd, lastKf;
 
     @Override
-    public void runOpMode() {
+    public void initialize() {
         if (!RUN_USING_ENCODER) {
             RobotLog.setGlobalErrorMsg("%s does not need to be run if the built-in motor velocity" +
                     "PID is not in use", getClass().getSimpleName());
         }
 
-        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        drive = new SampleMecanumDrive(hardwareMap);
+        gamepad = new GamepadEx(gamepad1);
 
-        addPidVariable();
+        drive = new Drivetrain(new SampleMecanumDrive(hardwareMap), false);
+        mode = Mode.TUNING_MODE;
 
-        NanoClock clock = NanoClock.system();
+        lastKp = MOTOR_VELO_PID.p;
+        lastKi = MOTOR_VELO_PID.i;
+        lastKd = MOTOR_VELO_PID.d;
+        lastKf = MOTOR_VELO_PID.f;
+
+        drive.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
+
+       clock = NanoClock.system();
 
         telemetry.addLine("Ready!");
         telemetry.update();
         telemetry.clearAll();
 
-        waitForStart();
+        schedule(new InstantCommand(() -> {
+            movingForwards = true;
+            activeProfile = generateProfile(true);
+            profileStart = clock.seconds();
+        }), new RunCommand(() -> telemetry.addData("mode", mode)));
 
-        if (isStopRequested()) return;
+        xButton = new GamepadButton(gamepad, GamepadKeys.Button.X)
+                .whenPressed(() -> {
+                    mode = Mode.DRIVER_MODE;
+                    drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                });
+        aButton = new GamepadButton(gamepad, GamepadKeys.Button.A)
+                .whenPressed(() -> {
+                    drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        boolean movingForwards = true;
-        MotionProfile activeProfile = generateProfile(true);
-        double profileStart = clock.seconds();
+                    mode = Mode.TUNING_MODE;
+                    movingForwards = true;
+                    activeProfile = generateProfile(movingForwards);
+                    profileStart = clock.seconds();
+                });
 
+        schedule(new RunCommand(() -> {
+            switch (mode) {
+                case TUNING_MODE:
+                    double profileTime = clock.seconds() - profileStart;
 
-        while (!isStopRequested()) {
-            // calculate and set the motor power
-            double profileTime = clock.seconds() - profileStart;
+                    if (profileTime > activeProfile.duration()) {
+                        // generate a new profile
+                        movingForwards = !movingForwards;
+                        activeProfile = generateProfile(movingForwards);
+                        profileStart = clock.seconds();
+                    }
 
-            if (profileTime > activeProfile.duration()) {
-                // generate a new profile
-                movingForwards = !movingForwards;
-                activeProfile = generateProfile(movingForwards);
-                profileStart = clock.seconds();
+                    MotionState motionState = activeProfile.get(profileTime);
+                    double targetPower = kV * motionState.getV();
+                    drive.setDrivePower(new Pose2d(targetPower, 0, 0));
+
+                    List<Double> velocities = drive.getWheelVelocities();
+
+                    // update telemetry
+                    telemetry.addData("targetVelocity", motionState.getV());
+                    for (int i = 0; i < velocities.size(); i++) {
+                        telemetry.addData("measuredVelocity" + i, velocities.get(i));
+                        telemetry.addData(
+                                "error" + i,
+                                motionState.getV() - velocities.get(i)
+                        );
+                    }
+                    break;
+                case DRIVER_MODE:
+                    drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+                    break;
             }
+        }, drive).alongWith(new RunCommand(() -> {
+            if (lastKp != MOTOR_VELO_PID.p || lastKd != MOTOR_VELO_PID.d
+                    || lastKi != MOTOR_VELO_PID.i || lastKf != MOTOR_VELO_PID.f) {
+                drive.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
 
-            MotionState motionState = activeProfile.get(profileTime);
-            double targetPower = kV * motionState.getV();
-            drive.setDrivePower(new Pose2d(targetPower, 0, 0));
-
-            List<Double> velocities = drive.getWheelVelocities();
-
-            // update telemetry
-            telemetry.addData("targetVelocity", motionState.getV());
-            for (int i = 0; i < velocities.size(); i++) {
-                telemetry.addData("velocity" + i, velocities.get(i));
-                telemetry.addData("error" + i, motionState.getV() - velocities.get(i));
+                lastKp = MOTOR_VELO_PID.p;
+                lastKi = MOTOR_VELO_PID.i;
+                lastKd = MOTOR_VELO_PID.d;
+                lastKf = MOTOR_VELO_PID.f;
             }
             telemetry.update();
-        }
-
-        removePidVariable();
+        }, drive)));
     }
+
 }

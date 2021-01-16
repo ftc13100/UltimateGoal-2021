@@ -1,13 +1,20 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.PerpetualCommand;
+import com.arcrobotics.ftclib.command.ScheduleCommand;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.commands.DefaultDrive;
+import org.firstinspires.ftc.teamcode.commands.RunCommand;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -15,53 +22,37 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * errors are not out of the ordinary, especially with sudden drive motions). The goal of this
  * exercise is to ascertain whether the localizer has been configured properly (note: the pure
  * encoder localizer heading may be significantly off if the track width has not been tuned).
+ *
+ * NOTE: this has been refactored to use FTCLib's command-based
  */
 @Config
 @TeleOp(group = "drive")
-public class LocalizationTest extends LinearOpMode {
-    public static double VX_WEIGHT = 1;
-    public static double VY_WEIGHT = 1;
-    public static double OMEGA_WEIGHT = 1;
+public class LocalizationTest extends CommandOpMode {
+
+    private Drivetrain drive;
+    private DefaultDrive driveCommand;
+    private GamepadEx gamepad;
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+    public void initialize() {
+        drive = new Drivetrain(new SampleMecanumDrive(hardwareMap), false);
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        schedule(new PerpetualCommand(new RunCommand(
+                () -> {
+                    Pose2d poseEstimate = drive.getPoseEstimate();
+                    telemetry.addData("x", poseEstimate.getX());
+                    telemetry.addData("y", poseEstimate.getY());
+                    telemetry.addData("heading", poseEstimate.getHeading());
+                    telemetry.update();
+                }   // ignore requirements
+        )));
 
-        waitForStart();
+        driveCommand = new DefaultDrive(
+                drive, () -> -gamepad.getLeftY(),
+                gamepad::getLeftX, gamepad::getRightX
+        );
 
-        while (!isStopRequested()) {
-            Pose2d baseVel = new Pose2d(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x
-            );
-
-            Pose2d vel;
-            if (Math.abs(baseVel.getX()) + Math.abs(baseVel.getY()) + Math.abs(baseVel.getHeading()) > 1) {
-                // re-normalize the powers according to the weights
-                double denom = VX_WEIGHT * Math.abs(baseVel.getX())
-                    + VY_WEIGHT * Math.abs(baseVel.getY())
-                    + OMEGA_WEIGHT * Math.abs(baseVel.getHeading());
-                vel = new Pose2d(
-                    VX_WEIGHT * baseVel.getX(),
-                    VY_WEIGHT * baseVel.getY(),
-                    OMEGA_WEIGHT * baseVel.getHeading()
-                ).div(denom);
-            } else {
-                vel = baseVel;
-            }
-
-            drive.setDrivePower(vel);
-
-            drive.update();
-
-            Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("x", poseEstimate.getX());
-            telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.update();
-        }
+        schedule(driveCommand);
     }
+
 }
