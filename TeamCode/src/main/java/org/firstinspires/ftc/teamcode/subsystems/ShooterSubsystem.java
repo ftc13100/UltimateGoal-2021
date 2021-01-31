@@ -24,7 +24,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         this.shooterFlywheel.setRunMode(Motor.RunMode.VelocityControl);
         this.shooterFlywheel.setVeloCoefficients(1.2, 0, 0.07);
-        this.shooterFlywheel.setFeedforwardCoefficients(0, 1.1);
+        // this.shooterFlywheel.setFeedforwardCoefficients(0, 1.1);
     }
 
     public void shoot() {
@@ -47,6 +47,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void home() {
         shooterFlicker.setPosition(0.27);
+    }
+
+    public void setRunMode(Motor.RunMode runMode){
+        shooterFlywheel.setRunMode(runMode);
     }
 
     @Override

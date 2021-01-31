@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands.shooter;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
@@ -11,7 +12,7 @@ public class ShooterCommand extends CommandBase {
     public ShooterCommand(ShooterSubsystem shooter) {
         this.shooterSubsystem = shooter;
 
-        addRequirements(shooterSubsystem);
+        //addRequirements(this.shooterSubsystem);
     }
 
     @Override
@@ -26,6 +27,7 @@ public class ShooterCommand extends CommandBase {
     }
 
     public void stopShooter() {
+        shooterSubsystem.setRunMode(Motor.RunMode.RawPower);
         shooterSubsystem.stop();
     }
 
