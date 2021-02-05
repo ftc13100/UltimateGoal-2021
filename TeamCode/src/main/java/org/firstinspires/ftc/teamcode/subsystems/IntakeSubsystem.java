@@ -13,7 +13,7 @@ public class IntakeSubsystem extends SubsystemBase {
         this.intakeMotorLeft = left;
 
         this.intakeMotorLeft.setInverted(false);
-        this.intakeMotorRight.setInverted(true); //TODO: set both to true for correct triggers
+        this.intakeMotorRight.setInverted(true);
     }
 
     public void in() {

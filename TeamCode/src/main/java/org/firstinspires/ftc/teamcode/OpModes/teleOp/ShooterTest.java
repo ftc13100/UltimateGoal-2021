@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opModes;
+package org.firstinspires.ftc.teamcode.opModes.teleOp;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.commands.groups.ShooterGroup;
 import org.firstinspires.ftc.teamcode.commands.shooter.ShooterCommand;
@@ -19,7 +20,7 @@ public class ShooterTest extends CommandOpMode {
 
     private Motor shooter;
 
-    private SimpleServo flicker;
+    private Servo flicker;
 
     private ShooterSubsystem shooterSubsystem;
 
@@ -35,7 +36,7 @@ public class ShooterTest extends CommandOpMode {
     @Override
     public void initialize() {
         this.shooter = new Motor(hardwareMap, "shooter");
-        this.flicker = new SimpleServo(hardwareMap, "flicker", 0, 270);
+        this.flicker = hardwareMap.get(Servo.class, "flicker");
 
         this.flickAction = new TimedAction(
                 ()-> flicker.setPosition(0.5),
