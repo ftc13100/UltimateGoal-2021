@@ -39,9 +39,9 @@ public class ShooterTest extends CommandOpMode {
         this.flicker = hardwareMap.get(Servo.class, "flicker");
 
         this.flickAction = new TimedAction(
-                ()-> flicker.setPosition(0.5),
-                ()-> flicker.setPosition(0.27),
-                1000,
+                ()-> flicker.setPosition(0.75),
+                ()-> flicker.setPosition(0.1),
+                600,
                 true
         );
 
@@ -51,7 +51,7 @@ public class ShooterTest extends CommandOpMode {
         this.runFlywheelCommand = new InstantCommand(shooterSubsystem::shoot, shooterSubsystem);
 
         this.shooterGroup = new ShooterGroup(runFlywheelCommand,
-                new WaitCommand(1500), shooterCommand);
+                new WaitCommand(750), shooterCommand);
 
         driver = new GamepadEx(gamepad1);
 
