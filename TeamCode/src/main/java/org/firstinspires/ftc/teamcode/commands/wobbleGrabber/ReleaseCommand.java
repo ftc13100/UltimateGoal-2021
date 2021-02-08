@@ -11,6 +11,6 @@ public class ReleaseCommand extends CommandBase {
     }
     @Override
     public void execute() {
-        this.WobbleGrabber.release();
+        this.WobbleGrabber.openGrabber();
     }
 }

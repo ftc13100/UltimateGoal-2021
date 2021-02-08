@@ -1,19 +1,11 @@
 package org.firstinspires.ftc.teamcode.opModes.auto;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.commands.drive.MecanumDriveCommand;
-import org.firstinspires.ftc.teamcode.commands.groups.ShooterGroup;
-import org.firstinspires.ftc.teamcode.commands.groups.StraightShootCommand;
-import org.firstinspires.ftc.teamcode.commands.intake.IntakeCommand;
-import org.firstinspires.ftc.teamcode.commands.intake.OuttakeCommand;
-import org.firstinspires.ftc.teamcode.commands.shooter.ShooterCommand;
+import org.firstinspires.ftc.teamcode.commands.groups.auto.StraightShootCommand;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.util.TimedAction;

@@ -11,6 +11,6 @@ public class GrabCommand extends CommandBase {
     }
     @Override
     public void execute() {
-        this.WobbleGrabber.grab();
+        this.WobbleGrabber.closeGrabber();
     }
 }

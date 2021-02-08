@@ -11,6 +11,6 @@ public class GoToMidCommand extends CommandBase {
     }
     @Override
     public void execute() {
-        this.WobbleGrabber.goToMid();
+        this.WobbleGrabber.armHome();
     }
 }

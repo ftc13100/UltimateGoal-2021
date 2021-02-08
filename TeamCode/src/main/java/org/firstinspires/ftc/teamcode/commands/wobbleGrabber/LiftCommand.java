@@ -11,6 +11,6 @@ public class LiftCommand extends CommandBase {
     }
     @Override
     public void execute() {
-        this.WobbleGrabber.lift();
+        this.WobbleGrabber.armUp();
     }
 }

@@ -11,6 +11,6 @@ public class LowerCommand extends CommandBase {
     }
     @Override
     public void execute() {
-        this.WobbleGrabber.lower();
+        this.WobbleGrabber.armDown();
     }
 }

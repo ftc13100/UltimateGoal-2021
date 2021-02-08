@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.commands.drive;
+package org.firstinspires.ftc.teamcode.commands.groups.auto;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.InstantCommand;
