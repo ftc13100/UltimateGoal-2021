@@ -64,27 +64,28 @@ public class MainTeleOp extends CommandOpMode {
 
         this.intakeSubsystem = new IntakeSubsystem(this.intakeRight, this.intakeLeft);
         this.shooterSubsystem = new ShooterSubsystem(shooter, flicker, flickAction, telemetry);
-        //this.mecanumDriveSubsystem = new MecanumDriveSubsystem(new SampleMecanumDrive(hardwareMap), false);
+        this.mecanumDriveSubsystem = new MecanumDriveSubsystem(new SampleMecanumDrive(hardwareMap), false);
 
         this.intakeCommand = new IntakeCommand(this.intakeSubsystem);
         this.outtakeCommand = new OuttakeCommand(this.intakeSubsystem);
         this.shooterCommand = new ShooterCommand(this.shooterSubsystem);
         this.runFlywheelCommand = new InstantCommand(shooterSubsystem::shoot, shooterSubsystem);
-        /*this.mecanumDriveCommand = new MecanumDriveCommand(mecanumDriveSubsystem, () -> -driver.getLeftY(),
+        driver = new GamepadEx(gamepad1);
+        this.mecanumDriveCommand = new MecanumDriveCommand(this.mecanumDriveSubsystem, () -> -driver.getLeftY(),
                 driver::getLeftX, driver::getRightX
-        );*/
+        );
 
         this.shooterGroup = new ShooterGroup(runFlywheelCommand,
                 new WaitCommand(750), shooterCommand);
 
-        driver = new GamepadEx(gamepad1);
+
 
         driver.getGamepadButton(GamepadKeys.Button.A).whenHeld(this.shooterGroup);
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(this.intakeCommand);
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(this.outtakeCommand);
 
-        //register(mecanumDriveSubsystem);
-        //mecanumDriveSubsystem.setDefaultCommand(mecanumDriveCommand);
+        register(this.mecanumDriveSubsystem);
+        this.mecanumDriveSubsystem.setDefaultCommand(this.mecanumDriveCommand);
     }
 }
